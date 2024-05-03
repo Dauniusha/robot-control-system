@@ -1,0 +1,19 @@
+{
+  "name": "robot-control-system",
+  "packageManager": "yarn@4.0.1",
+  "devDependencies": {
+    "husky": "^9.0.11",
+    "prettier": "^3.2.5",
+    "xo": "^0.57.0"
+  },
+  "lint-staged": {
+    "*.{ts,js}": "yarn run lint",
+    "*.{ts,js,css,md}": "yarn run format"
+  },
+  "scripts": {
+    "lint": "xo --fix",
+    "format": "xo --prettier",
+    "postinstall": "husky",
+    "test": "cd backend-api && yarn test"
+  }
+}

@@ -1,0 +1,17 @@
+name: Test On Pull Request
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    # environment: development
+
+    steps:
+      - name: Build
+        run: |
+          sudo echo "Hello"

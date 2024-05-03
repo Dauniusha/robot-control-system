@@ -1,0 +1,24 @@
+{
+  "ignores": [
+    "coverage"
+  ],
+  "space": true,
+  "prettier": true,
+  "rules": {
+    "import/extensions": "off",
+    "new-cap": "off",
+    "@typescript-eslint/promise-function-async": "off",
+    "@typescript-eslint/consistent-type-assertions": "off",
+    "@typescript-eslint/consistent-type-definitions": "off",
+    "unicorn/prefer-top-level-await": "off",
+    "unicorn/switch-case-braces": "off",
+    "@typescript-eslint/parameter-properties": "off",
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/no-unused-expressions": [
+      "error",
+      {
+        "allowTernary": true
+      }
+    ]
+  }
+}
