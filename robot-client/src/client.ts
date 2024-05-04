@@ -3,8 +3,8 @@ import { io } from 'socket.io-client';
 
 const socket = io(`${process.env.SERVER_URL}?id=${process.env.ROBOT_ID}`);
 
-type Point = { x: number; y: number };
-type Path = Point[];
+type Coordinate = { x: number; y: number };
+type Path = Coordinate[];
 
 socket.on('connect', () => {
   console.log('Robot connected');
@@ -34,7 +34,7 @@ function traversePath(path: Path) {
   }
 }
 
-function moveRobotToPoint(point: Point) {
+function moveRobotToPoint(point: Coordinate) {
   throw new Error('Not implemented');
 }
 

@@ -1,10 +1,12 @@
 import { BadRequestException } from '@nestjs/common';
 import { type Robot } from './robot';
 
-export type Coordinate = {
-  x: number;
-  y: number;
-};
+export class Coordinate {
+  constructor(
+    readonly x: number,
+    readonly y: number,
+  ) {}
+}
 
 export interface SchemaPoint {
   id: string;
