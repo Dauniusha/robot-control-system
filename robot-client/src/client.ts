@@ -1,7 +1,7 @@
 import * as process from 'node:process';
 import { io } from 'socket.io-client';
 
-const socket = io(process.env.SERVER_URL);
+const socket = io(`${process.env.SERVER_URL}?id=${process.env.ROBOT_ID}`);
 
 type Point = { x: number; y: number };
 type Path = Point[];
@@ -15,11 +15,11 @@ socket.on('connect', () => {
 
       const targetPoint = path.pop();
       socket.emit('target_point_reached', { point: targetPoint });
-      await releaseCompleted(); // eslint-disable-line no-await-in-loop
+      await released(); // eslint-disable-line no-await-in-loop
     }
 
     const details = {};
-    socket.emit('target_point_reached', details);
+    socket.emit('operation_finished', details);
   });
 });
 
@@ -35,11 +35,11 @@ function traversePath(path: Path) {
 }
 
 function moveRobotToPoint(point: Point) {
-  // Not implemented
+  throw new Error('Not implemented');
 }
 
-function releaseCompleted(): Promise<void> {
+function released(): Promise<void> {
   return new Promise((resolve) => {
-    socket.on('release_complited', resolve);
+    socket.on('released', resolve);
   });
 }
