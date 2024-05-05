@@ -6,7 +6,7 @@ import { type RobotsRepository } from '../../core/repositories';
 import { SqlRobotToRobotConverter } from '../converters/sql-robot-to-robot.converter';
 
 export class SqlRobotsRepository implements RobotsRepository {
-  private readonly sqlRobotToRobotConverter = new SqlRobotToRobotConverter();
+  private readonly robotConverter = new SqlRobotToRobotConverter();
 
   constructor(private readonly prismaService: PrismaService) {}
 
@@ -30,7 +30,7 @@ export class SqlRobotsRepository implements RobotsRepository {
 
     if (!robot) return undefined;
 
-    return this.sqlRobotToRobotConverter.convert(robot);
+    return this.robotConverter.convert(robot);
   }
 
   async update(robot: Robot): Promise<void> {

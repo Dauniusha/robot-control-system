@@ -4,7 +4,7 @@ export function findPath(
   field: number[][],
   start: Coordinate,
   end: Coordinate,
-) {
+): Coordinate[] {
   const rows = field.length;
   const cols = field[0].length;
   const visited = Array.from({ length: rows }).map(() =>

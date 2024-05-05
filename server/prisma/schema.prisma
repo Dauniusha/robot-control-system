@@ -64,10 +64,12 @@ model Schema {
   id              String @id @RobotControlSystem.Uuid
   name            String @unique @RobotControlSystem.VarChar(40)
   assignedRobotId String @map("assigned_robot_id") @RobotControlSystem.Uuid
+  rows            Int
+  columns         Int
   robotBaseId     String @map("robot_base_id") @RobotControlSystem.Uuid
   version         Int    @default(1)
 
-  rootBase      SchemaPoint    @relation(fields: [robotBaseId], references: [id], onDelete: Restrict)
+  robotBase     SchemaPoint    @relation(fields: [robotBaseId], references: [id], onDelete: Restrict)
   releasePoints ReleasePoint[]
   barriers      Barrier[]
   operations    Operation[]

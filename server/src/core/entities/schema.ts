@@ -21,6 +21,8 @@ export interface WebhookedSchemaPoint extends SchemaPoint {
 export class Schema {
   id!: string;
   name!: string;
+  rows!: number;
+  columns!: number;
   assignedRobot!: Robot;
   robotBase!: SchemaPoint;
   barriers!: Coordinate[];
@@ -48,5 +50,17 @@ export class Schema {
     );
 
     return pointsMap.get(String(point.x) + String(point.y));
+  }
+
+  toMatrix(): number[][] {
+    const matrix = Array.from({ length: this.rows }, () =>
+      Array.from({ length: this.columns }, () => 0),
+    );
+
+    for (const barrier of this.barriers) {
+      matrix[barrier.y][barrier.x] = 1;
+    }
+
+    return matrix;
   }
 }

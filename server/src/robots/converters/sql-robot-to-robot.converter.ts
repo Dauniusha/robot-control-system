@@ -11,15 +11,13 @@ type SqlOperation = prisma.Operation & {
   schema: prisma.Schema;
 };
 
-type SqlDatabaseRobot = prisma.Robot & {
+export type SqlRobot = prisma.Robot & {
   status: prisma.WorkloadStatus;
-  operations: SqlOperation[];
+  operations?: SqlOperation[];
 };
 
-export class SqlRobotToRobotConverter
-  implements Converter<SqlDatabaseRobot, Robot>
-{
-  convert(details: SqlDatabaseRobot): Robot {
+export class SqlRobotToRobotConverter implements Converter<SqlRobot, Robot> {
+  convert(details: SqlRobot): Robot {
     const robot = new Robot();
 
     robot.id = details.id;
@@ -28,10 +26,13 @@ export class SqlRobotToRobotConverter
       id: details.status.id as WorkloadStatus,
     };
     robot.model = details.model;
-    robot.runningOperation = this.convertOperation(
-      details.operations[0],
-      robot,
-    );
+
+    if (details.operations) {
+      robot.runningOperation = this.convertOperation(
+        details.operations[0],
+        robot,
+      );
+    }
 
     return robot;
   }
