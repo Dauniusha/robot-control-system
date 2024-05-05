@@ -1,0 +1,113 @@
+generator client {
+  provider        = "prisma-client-js"
+  output          = "./generated"
+  previewFeatures = []
+}
+
+datasource RobotControlSystem {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model WorkloadStatus {
+  id            String  @id @RobotControlSystem.VarChar(30)
+  name          String  @unique @RobotControlSystem.VarChar(30)
+  orderPosition Int     @map("order_position")
+  robots        Robot[]
+
+  @@index([orderPosition])
+  @@map("workload_statuses")
+}
+
+model Robot {
+  id        String         @id @RobotControlSystem.Uuid
+  statusId  String         @map("status_id") @RobotControlSystem.VarChar(20)
+  model     String         @RobotControlSystem.VarChar(20)
+  status    WorkloadStatus @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  createdAt DateTime       @default(now()) @map("created_at")
+
+  operations Operation[]
+
+  @@map("robots")
+}
+
+model Operation {
+  id        String    @id @RobotControlSystem.Uuid
+  robotId   String    @map("robot_id") @RobotControlSystem.Uuid
+  schemaId  String    @map("schema_id") @RobotControlSystem.Uuid
+  status    String    @RobotControlSystem.Uuid
+  createdAt DateTime  @default(now()) @map("created_at")
+  doneAt    DateTime? @map("done_at")
+
+  robot      Robot       @relation(fields: [robotId], references: [id], onDelete: Cascade)
+  schema     Schema      @relation(fields: [schemaId], references: [id], onDelete: Restrict)
+  pathPoints PathPoint[]
+
+  @@map("operations")
+}
+
+model PathPoint {
+  id          String  @id @RobotControlSystem.Uuid
+  operationId String  @map("operation_id") @RobotControlSystem.Uuid
+  x           Int
+  y           Int
+  targetPoint Boolean @map("target_point") @RobotControlSystem.Boolean
+  visitNumber Int     @map("visit_number")
+
+  operation Operation @relation(fields: [operationId], references: [id], onDelete: Cascade)
+
+  @@index([operationId])
+  @@map("path_points")
+}
+
+model Schema {
+  id              String @id @RobotControlSystem.Uuid
+  name            String @unique @RobotControlSystem.VarChar(40)
+  assignedRobotId String @map("assigned_robot_id") @RobotControlSystem.Uuid
+  robotBaseId     String @map("robot_base_id") @RobotControlSystem.Uuid
+  version         Int    @default(1)
+
+  rootBase      SchemaPoint    @relation(fields: [robotBaseId], references: [id], onDelete: Restrict)
+  releasePoints ReleasePoint[]
+  barriers      Barrier[]
+  operations    Operation[]
+
+  @@map("schemas")
+}
+
+model SchemaPoint {
+  id   String @id @RobotControlSystem.Uuid
+  name String @unique @RobotControlSystem.VarChar(40)
+  x    Int
+  y    Int
+
+  schemas       Schema[]
+  releasePoints ReleasePoint[]
+
+  @@map("schema_points")
+}
+
+model ReleasePoint {
+  id         String @id @RobotControlSystem.Uuid
+  schemaId   String @map("schema_id") @RobotControlSystem.Uuid
+  pointId    String @map("point_id") @RobotControlSystem.Uuid
+  webhookUrl String @map("webhook_url") @RobotControlSystem.VarChar(512)
+
+  schema Schema      @relation(fields: [schemaId], references: [id], onDelete: Cascade)
+  point  SchemaPoint @relation(fields: [pointId], references: [id], onDelete: Restrict)
+
+  @@index([schemaId])
+  @@map("release_points")
+}
+
+model Barrier {
+  schemaId String @map("schema_id") @RobotControlSystem.Uuid
+  x        Int
+  y        Int
+
+  schema Schema @relation(fields: [schemaId], references: [id], onDelete: Cascade)
+
+  @@id([schemaId, x, y])
+  @@index([schemaId])
+  @@map("barriers")
+}

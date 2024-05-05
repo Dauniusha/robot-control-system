@@ -1,2 +1,3 @@
-export * from './users.repository';
-export * from './domain-logs.repository';
+export * from './operations.repository';
+export * from './robots.repository';
+export * from './schemas.repository';

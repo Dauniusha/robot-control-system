@@ -2,22 +2,46 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { WorkloadStatus } from './workload-status';
 import { type Operation } from './operation';
 
+export class WorkloadStatusDetails {
+  static free(): WorkloadStatusDetails {
+    const details = new WorkloadStatusDetails();
+    details.id = WorkloadStatus.Free;
+    return details;
+  }
+
+  static inOperation(): WorkloadStatusDetails {
+    const details = new WorkloadStatusDetails();
+    details.id = WorkloadStatus.InOperation;
+    return details;
+  }
+
+  static onHold(): WorkloadStatusDetails {
+    const details = new WorkloadStatusDetails();
+    details.id = WorkloadStatus.OnHold;
+    return details;
+  }
+
+  id!: WorkloadStatus;
+  name!: string;
+  orderPosition!: number;
+}
+
 export class Robot {
   id!: string;
-  status!: WorkloadStatus;
+  status!: WorkloadStatusDetails;
   model!: string;
   runningOperation?: Omit<Operation, 'robot'>;
 
   get free(): boolean {
-    return this.status === WorkloadStatus.Free;
+    return this.status === WorkloadStatusDetails.free();
   }
 
   startOperation() {
-    if (this.status !== WorkloadStatus.Free) {
+    if (this.status.id !== WorkloadStatus.Free) {
       throw new BadRequestException(`Robot ${this.id} is not free`);
     }
 
-    this.status = WorkloadStatus.InOperation;
+    this.status = WorkloadStatusDetails.inOperation();
   }
 
   finishOperation() {
@@ -27,28 +51,28 @@ export class Robot {
       );
     }
 
-    if (this.status !== WorkloadStatus.InOperation) {
+    if (this.status.id !== WorkloadStatus.InOperation) {
       throw new BadRequestException(`Robot ${this.id} is not in operation`);
     }
 
-    this.status = WorkloadStatus.Free;
+    this.status = WorkloadStatusDetails.free();
 
     this.runningOperation.commit();
   }
 
   hold() {
-    if (this.status === WorkloadStatus.OnHold) {
+    if (this.status.id === WorkloadStatus.OnHold) {
       throw new BadRequestException(`Robot ${this.id} is on hold already`);
     }
 
-    this.status = WorkloadStatus.OnHold;
+    this.status = WorkloadStatusDetails.onHold();
   }
 
   release() {
-    if (this.status !== WorkloadStatus.OnHold) {
+    if (this.status.id !== WorkloadStatus.OnHold) {
       throw new BadRequestException(`Robot ${this.id} should be on hold`);
     }
 
-    this.status = WorkloadStatus.InOperation;
+    this.status = WorkloadStatusDetails.inOperation();
   }
 }
