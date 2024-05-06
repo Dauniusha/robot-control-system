@@ -1,6 +1,6 @@
 import * as crypto from 'node:crypto';
 import { BadRequestException } from '@nestjs/common';
-import { NavigationService } from '../../robots/navigation.service';
+import { PathBuilder } from '../../robots/path.builder';
 import { type Coordinate, type Schema } from './schema';
 import { type Robot } from './robot';
 import { OperationStatus } from './operation-status';
@@ -11,7 +11,7 @@ export class Operation {
   static initiate(schema: Schema, pointIds: string[]): Operation {
     schema.assignedRobot.startOperation();
     const points = schema.getPointsByIds(pointIds);
-    const paths = NavigationService.generatePath(schema, points);
+    const paths = new PathBuilder(schema).withTargetPoints(points).build();
 
     return Operation.create(schema, paths);
   }

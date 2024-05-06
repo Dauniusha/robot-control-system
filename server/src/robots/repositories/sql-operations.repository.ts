@@ -12,6 +12,7 @@ export class SqlOperationsRepository implements OperationsRepository {
 
   async create(operation: Operation): Promise<void> {
     const { robot, schema, paths, ...operationDetails } = operation;
+
     await this.prismaService.client.operation.create({
       data: {
         ...operationDetails,
