@@ -1,6 +1,7 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { WorkloadStatus } from './workload-status';
 import { type Operation } from './operation';
+import { type Schema } from './schema';
 
 export class WorkloadStatusDetails {
   static free(): WorkloadStatusDetails {
@@ -31,6 +32,7 @@ export class Robot {
   status!: WorkloadStatusDetails;
   model!: string;
   runningOperation?: Omit<Operation, 'robot'>;
+  schema?: Omit<Schema, 'assignedRobot'>;
 
   get free(): boolean {
     return this.status === WorkloadStatusDetails.free();
@@ -74,5 +76,9 @@ export class Robot {
     }
 
     this.status = WorkloadStatusDetails.inOperation();
+  }
+
+  unassign() {
+    this.schema = null;
   }
 }

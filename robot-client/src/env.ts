@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 declare namespace NodeJS {
-  export interface ProcessEnv {
+  export type ProcessEnv = {
     SERVER_URL: string;
     ROBOT_ID: string;
-  }
+  };
 }

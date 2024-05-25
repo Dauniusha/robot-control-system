@@ -11,9 +11,9 @@ export function findPath(
     Array.from({ length: cols }, () => false),
   );
   const queue: Coordinate[] = [];
-  const parent: Array<Array<Coordinate | null>> = Array.from({
+  const parent: Array<Array<Coordinate | undefined>> = Array.from({
     length: rows,
-  }).map(() => Array.from({ length: cols }, () => null));
+  }).map(() => Array.from({ length: cols }, () => undefined));
 
   visited[start.y][start.x] = true;
   queue.push(start);
@@ -68,13 +68,13 @@ function getNeighbors(
 }
 
 function reconstructPath(
-  parent: Array<Array<Coordinate | null>>,
+  parent: Array<Array<Coordinate | undefined>>,
   end: Coordinate,
 ) {
   const path: Coordinate[] = [];
-  let current: Coordinate | null = end;
+  let current: Coordinate | undefined = end;
 
-  while (current !== null) {
+  while (current !== undefined) {
     path.unshift(current);
     current = parent[current.y][current.x];
   }

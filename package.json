@@ -4,7 +4,7 @@
   "devDependencies": {
     "husky": "^9.0.11",
     "prettier": "^3.2.5",
-    "xo": "^0.57.0"
+    "xo": "^0.58.0"
   },
   "lint-staged": {
     "*.{ts,js}": "yarn run lint",
@@ -14,6 +14,6 @@
     "lint": "xo --fix",
     "format": "xo --prettier",
     "postinstall": "husky",
-    "test": "cd backend-api && yarn test"
+    "test": "cd server && yarn test"
   }
 }

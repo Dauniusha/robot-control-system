@@ -15,7 +15,7 @@ describe('Lee Algorithm', () => {
 
     const bestPath = findPath(field, start, end);
 
-    expect(bestPath).toStrictEqual([
+    expect(bestPath).toEqual([
       { x: 0, y: 0 },
       { x: 0, y: 1 },
       { x: 1, y: 1 },

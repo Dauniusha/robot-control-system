@@ -1,10 +1,10 @@
-export interface BatchMeta {
+export type BatchMeta = {
   offset: number;
   limit: number;
   total: number;
-}
+};
 
-export interface Batch<T> {
+export type Batch<T> = {
   items: T[];
   meta?: BatchMeta;
-}
+};

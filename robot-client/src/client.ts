@@ -38,7 +38,7 @@ function moveRobotToPoint(point: Coordinate) {
   throw new Error('Not implemented');
 }
 
-function released(): Promise<void> {
+async function released(): Promise<void> {
   return new Promise((resolve) => {
     socket.on('released', resolve);
   });
