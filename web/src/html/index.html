@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Div Map</title>
+  <link rel="stylesheet" href="../styles/index.css">
+</head>
+<body>
+  <div class="map-container"></div>
+  <div>
+    <div class="mode-container">
+      <div>Mode:</div>
+      <div id="mode">barriers</div>
+    </div>
+    <label for="mapWidth">Map Width:</label>
+    <input type="number" id="mapWidth" min="1" max="100" value="5">
+    <br>
+    <label for="mapHeight">Map Height:</label>
+    <input type="number" id="mapHeight" min="1" max="100" value="5">
+    <br>
+    <br>
+    <button onclick="selectMode('barriers')">Barriers mode</button>
+    <button onclick="selectMode('points')">Points mode</button>
+    <button onclick="selectMode('base')">Base mode</button>
+    <button onclick="generateMap()">Generate Map</button>
+    <button onclick="saveMap()">Save Map</button>
+    <button onclick="regenerateMap()">Regenerate Map</button>
+  </div>
+  <script src="../js/index.js"></script>
+</body>
+</html>
