@@ -61,13 +61,14 @@ model PathPoint {
 }
 
 model Schema {
-  id              String @id @RobotControlSystem.Uuid
-  name            String @unique @RobotControlSystem.VarChar(40)
-  assignedRobotId String @map("assigned_robot_id") @RobotControlSystem.Uuid
+  id              String   @id @RobotControlSystem.Uuid
+  name            String   @unique @RobotControlSystem.VarChar(40)
+  assignedRobotId String?  @map("assigned_robot_id") @RobotControlSystem.Uuid
   rows            Int
   columns         Int
-  robotBaseId     String @map("robot_base_id") @RobotControlSystem.Uuid
-  version         Int    @default(1)
+  robotBaseId     String   @map("robot_base_id") @RobotControlSystem.Uuid
+  createdAt       DateTime @default(now()) @map("created_at")
+  version         Int      @default(1)
 
   robotBase     SchemaPoint    @relation(fields: [robotBaseId], references: [id], onDelete: Restrict)
   releasePoints ReleasePoint[]
@@ -83,7 +84,7 @@ model SchemaPoint {
   x    Int
   y    Int
 
-  schemas       Schema[]
+  schema        Schema[]
   releasePoints ReleasePoint[]
 
   @@map("schema_points")
