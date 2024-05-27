@@ -21,3 +21,7 @@ export type PositionDetails = {
 
 export type Coordinate = { x: number; y: number };
 export type Path = Coordinate[];
+
+export type Traversal = {
+  traversePath(path: Path): Promise<void>;
+};
