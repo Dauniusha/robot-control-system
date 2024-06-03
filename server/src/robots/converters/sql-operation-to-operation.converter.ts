@@ -36,6 +36,7 @@ export class SqlOperationToOperationConverter
     operation.schema.id = details.schema.id;
     operation.schema.columns = details.schema.columns;
     operation.schema.rows = details.schema.rows;
+    operation.schema.name = details.schema.name;
     operation.schema.barriers = details.schema.barriers;
     operation.schema.releasePoints = details.schema.releasePoints.map(
       (point) => ({

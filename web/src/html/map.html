@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Div Map</title>
+  <link rel="stylesheet" href="../styles/index.css">
+</head>
+<body class="container">
+  <div class="map-container"></div>
+  <div class="control-container">
+    <div class="mode-container">
+      <div>Mode:</div>
+      <div id="mode">barriers</div>
+    </div>
+    <label for="mapWidth">Map Width:</label>
+    <input type="number" id="mapWidth" min="1" max="100" value="5">
+    <br>
+    <label for="mapHeight">Map Height:</label>
+    <input type="number" id="mapHeight" min="1" max="100" value="5">
+    <br>
+    <label for="robotSerialNo">Robot Serial No:</label>
+    <input type="text" id="robotSerialNo" placeholder="Serial No" maxlength="30">
+    <br>
+    <br>
+    <button id="barriersMode">Barriers mode</button>
+    <button id="pointsMode">Points mode</button>
+    <button id="baseMode">Base mode</button>
+    <button id="saveBtn">Save Map</button>
+    <button id="regenerateBtn">Clear Map</button>
+  </div>
+  <script type="module" src="../js/map.js"></script>
+</body>
+</html>

@@ -17,9 +17,9 @@ async function bootstrap(): Promise<void> {
     { bufferLogs: true },
   );
   const config = app.get(Config);
+  console.log(config.clientAppUrl);
   app.enableCors({
     origin: [config.clientAppUrl],
-    credentials: true,
   });
   app.useLogger(app.get(Logger));
   app.useGlobalFilters(new AppExceptionsFilter());

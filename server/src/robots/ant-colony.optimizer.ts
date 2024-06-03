@@ -7,6 +7,8 @@ class AntColonyOptimizer {
   private readonly numIterations: number;
   private readonly evaporationCoef: number;
   private readonly pheromoneMatrix: number[][];
+  private readonly startPosition: number;
+  private readonly finishPosition?: number;
   private bestPath: number[];
   private bestPathLength: number;
 
@@ -17,6 +19,8 @@ class AntColonyOptimizer {
     smellCoef?: number;
     distanceCoef?: number;
     evaporationCoef?: number;
+    startPosition?: number;
+    finishPosition?: number;
   }) {
     this.distanceMatrix = parameters.distanceMatrix;
     this.smellCoef = parameters.smellCoef ?? 1;
@@ -30,6 +34,8 @@ class AntColonyOptimizer {
     );
     this.bestPath = [];
     this.bestPathLength = Number.POSITIVE_INFINITY;
+    this.startPosition = parameters.startPosition ?? 0;
+    this.finishPosition = parameters.finishPosition;
   }
 
   run(): [number[], number] {
@@ -48,12 +54,17 @@ class AntColonyOptimizer {
     for (let i = 0; i < Math.floor(this.numAnts); i++) {
       const visited = Array.from({ length: this.numCities }, () => false);
       const path: number[] = [];
-      let currentCity = Math.floor(Math.random() * this.numCities);
+      let currentCity = this.startPosition;
 
-      while (path.length < this.numCities) {
+      while (path.length < this.numCities + 1) {
         path.push(currentCity);
         visited[currentCity] = true;
-        currentCity = this.selectNextCity(currentCity, visited);
+
+        const lastCity = this.finishPosition && path.length === this.numCities;
+
+        currentCity = lastCity
+          ? this.finishPosition
+          : this.selectNextCity(currentCity, visited);
       }
 
       antPaths.push(path);
@@ -134,6 +145,17 @@ class AntColonyOptimizer {
     }
   }
 
+  private updateBestPath(antPaths: number[][]): void {
+    for (const path of antPaths) {
+      const pathLength = this.calculatePathLength(path);
+
+      if (pathLength < this.bestPathLength) {
+        this.bestPath = path;
+        this.bestPathLength = pathLength;
+      }
+    }
+  }
+
   private calculatePathLength(path: number[]): number {
     let length = 0;
 
@@ -145,15 +167,6 @@ class AntColonyOptimizer {
 
     return length;
   }
-
-  private updateBestPath(antPaths: number[][]): void {
-    for (const path of antPaths) {
-      const pathLength = this.calculatePathLength(path);
-
-      if (pathLength < this.bestPathLength) {
-        this.bestPath = path;
-        this.bestPathLength = pathLength;
-      }
-    }
-  }
 }
+
+export default AntColonyOptimizer;

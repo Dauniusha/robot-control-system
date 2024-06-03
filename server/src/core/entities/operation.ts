@@ -9,6 +9,10 @@ export type Path = Coordinate[];
 
 export class Operation {
   static initiate(schema: Schema, pointIds: string[]): Operation {
+    if (!schema.assignedRobot) {
+      throw new BadRequestException('Robot is not assigned');
+    }
+
     schema.assignedRobot.startOperation();
     const points = schema.getPointsByIds(pointIds);
     const paths = new PathBuilder(schema).withTargetPoints(points).build();
@@ -17,6 +21,10 @@ export class Operation {
   }
 
   private static create(schema: Schema, paths: Path[]) {
+    if (!schema.assignedRobot) {
+      throw new BadRequestException('Robot is not assigned');
+    }
+
     const operation = new Operation();
     operation.id = crypto.randomUUID();
     operation.schema = schema;

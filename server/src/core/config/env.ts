@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 declare namespace NodeJS {
-  export type ProcessEnv = {
+  export interface ProcessEnv {
     APP_URL: string;
     CLIENT_APP_URL: string;
     LOGGING_DEPTH: string | undefined;
@@ -18,5 +18,5 @@ declare namespace NodeJS {
     CONTENT_API_URL: string;
     DOMAIN_LOGS_BUFFER_SIZE: string;
     AROYA_SUGGESTIONS_API_URL: string;
-  };
+  }
 }

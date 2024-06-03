@@ -13,12 +13,19 @@ import { type SchemaSearchRequestDto } from '../core/dto/schema-search-request.d
 import { SchemaSearchResponseDto } from '../core/dto/schema-search-response.dto';
 import { SchemaCardDto, SchemaDto } from '../core/dto/schema-card.dto';
 import { type AssignRobotRequestDto } from '../core/dto/assign-robot-request.dto';
+import { type Robot } from '../core/entities/robot';
 
 export class SchemasService {
   constructor(
     private readonly schemasRepository: SchemasRepository,
     private readonly robotRepository: RobotsRepository,
   ) {}
+
+  async get(id: string): Promise<SchemaDto> {
+    const schema = await this.getById(id);
+
+    return SchemaDto.fromEntity(schema);
+  }
 
   async search(
     request: SchemaSearchRequestDto,
@@ -46,7 +53,10 @@ export class SchemasService {
   }
 
   async create(request: CreateMapDto): Promise<SchemaDto> {
-    const existingSchema = await this.schemasRepository.getByName(request.name);
+    const [existingSchema, robot] = await Promise.all([
+      this.schemasRepository.getByName(request.name),
+      this.getRobotBySerialNumber(request.robotSerialNumber),
+    ]);
 
     if (existingSchema) {
       throw new BadRequestException(`Schema ${request.name} already exists`);
@@ -55,6 +65,7 @@ export class SchemasService {
     const schema = Schema.create({
       ...request,
       robotBase: new SchemaPoint(request.base.name, request.base),
+      robotBaseWebhookUrl: request.baseWebhookUrl,
       releasePoints: request.points.map((point) => {
         return new WebhookedSchemaPoint(
           point.name,
@@ -62,6 +73,7 @@ export class SchemasService {
           point.webhookUrl,
         );
       }),
+      assignedRobot: robot,
     });
 
     await this.schemasRepository.create(schema);
@@ -89,11 +101,19 @@ export class SchemasService {
   }
 
   async edit(schemaId: string, request: CreateMapDto): Promise<void> {
-    const schema = await this.getById(schemaId);
+    const [schema, robot] = await Promise.all([
+      this.getById(schemaId),
+      this.getRobotBySerialNumber(request.robotSerialNumber),
+    ]);
 
     schema.edit({
       ...request,
-      robotBase: new SchemaPoint(request.base.name, request.base),
+      robotBase: new SchemaPoint(
+        request.base.name,
+        request.base,
+        schema.robotBase.id,
+      ),
+      robotBaseWebhookUrl: request.baseWebhookUrl,
       releasePoints: request.points.map((point) => {
         return new WebhookedSchemaPoint(
           point.name,
@@ -101,6 +121,7 @@ export class SchemasService {
           point.webhookUrl,
         );
       }),
+      assignedRobot: robot,
     });
 
     await this.schemasRepository.update(schema);
@@ -117,5 +138,19 @@ export class SchemasService {
 
     if (!schema) throw new NotFoundException(`Schema ${id} not found`);
     return schema;
+  }
+
+  private async getRobotBySerialNumber(
+    serialNumber?: string,
+  ): Promise<Robot | undefined> {
+    if (!serialNumber) return;
+
+    const robot = await this.robotRepository.getBySerialNumber(serialNumber);
+
+    if (!robot) {
+      throw new NotFoundException(`Robot ${serialNumber} not found`);
+    }
+
+    return robot;
   }
 }

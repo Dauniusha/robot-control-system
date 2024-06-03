@@ -1,3 +1,4 @@
+import * as crypto from 'node:crypto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { WorkloadStatus } from './workload-status';
 import { type Operation } from './operation';
@@ -28,9 +29,19 @@ export class WorkloadStatusDetails {
 }
 
 export class Robot {
+  static create(details: { model: string; serialNumber: string }): Robot {
+    const robot = new Robot();
+    robot.id = crypto.randomUUID();
+    robot.model = details.model;
+    robot.serialNumber = details.serialNumber;
+    robot.status = WorkloadStatusDetails.free();
+    return robot;
+  }
+
   id!: string;
   status!: WorkloadStatusDetails;
   model!: string;
+  serialNumber!: string;
   runningOperation?: Omit<Operation, 'robot'>;
   schema?: Omit<Schema, 'assignedRobot'>;
 
@@ -53,7 +64,7 @@ export class Robot {
       );
     }
 
-    if (this.status.id !== WorkloadStatus.InOperation) {
+    if (this.status.id === WorkloadStatus.Free) {
       throw new BadRequestException(`Robot ${this.id} is not in operation`);
     }
 
@@ -79,6 +90,6 @@ export class Robot {
   }
 
   unassign() {
-    this.schema = null;
+    this.schema = undefined;
   }
 }

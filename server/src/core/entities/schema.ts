@@ -33,8 +33,10 @@ type SchemaDetails = {
   rows: number;
   columns: number;
   robotBase: SchemaPoint;
+  robotBaseWebhookUrl: string;
   barriers: Coordinate[];
   releasePoints: WebhookedSchemaPoint[];
+  assignedRobot?: Robot;
 };
 
 export class Schema {
@@ -42,6 +44,11 @@ export class Schema {
     const schema = new Schema();
     schema.id = crypto.randomUUID();
     schema.assignDetails(details);
+
+    if (details.assignedRobot) {
+      schema.assignRobot(details.assignedRobot);
+    }
+
     return schema;
   }
 
@@ -49,13 +56,22 @@ export class Schema {
   name!: string;
   rows!: number;
   columns!: number;
-  assignedRobot?: Robot;
+  assignedRobot?: Omit<Robot, 'schema'>;
   robotBase!: SchemaPoint;
+  robotBaseWebhookUrl!: string;
   barriers!: Coordinate[];
   releasePoints!: WebhookedSchemaPoint[];
 
+  isRobotBase(point: Coordinate): boolean {
+    return (
+      point.x === this.robotBase.coordinate.x &&
+      point.y === this.robotBase.coordinate.y
+    );
+  }
+
   getPointsByIds(ids: string[]): SchemaPoint[] {
     const idsSet = new Set(ids);
+    console.log(this.releasePoints);
     const points = this.releasePoints.filter(({ id }) => idsSet.has(id));
 
     if (points.length !== ids.length) {
@@ -73,6 +89,11 @@ export class Schema {
         String(point.coordinate.x) + String(point.coordinate.y),
         point,
       ]),
+    );
+
+    pointsMap.set(
+      String(this.robotBase.coordinate.x) + String(this.robotBase.coordinate.y),
+      { ...this.robotBase, webhookUrl: this.robotBaseWebhookUrl },
     );
 
     return pointsMap.get(String(point.x) + String(point.y));
@@ -134,7 +155,9 @@ export class Schema {
     this.rows = details.rows;
     this.columns = details.columns;
     this.robotBase = details.robotBase;
+    this.robotBaseWebhookUrl = details.robotBaseWebhookUrl;
     this.barriers = details.barriers;
     this.releasePoints = details.releasePoints;
+    this.assignedRobot = details.assignedRobot;
   }
 }

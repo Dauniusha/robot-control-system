@@ -10,16 +10,45 @@ export class SqlOperationsRepository implements OperationsRepository {
 
   constructor(private readonly prismaService: PrismaService) {}
 
+  async getAll(): Promise<Operation[]> {
+    const operations = await this.prismaService.client.operation.findMany({
+      include: {
+        schema: {
+          include: {
+            barriers: {
+              select: { x: true, y: true },
+            },
+            releasePoints: {
+              include: { point: true },
+            },
+            robotBase: true,
+          },
+        },
+        pathPoints: true,
+        robot: {
+          include: { status: true },
+        },
+      },
+    });
+
+    return operations.map((item) => this.operationConverter.convert(item));
+  }
+
   async create(operation: Operation): Promise<void> {
     const { robot, schema, paths, ...operationDetails } = operation;
 
-    await this.prismaService.client.operation.create({
+    await this.prismaService.client.robot.update({
+      where: { id: robot.id },
       data: {
-        ...operationDetails,
-        robotId: robot.id,
-        schemaId: schema.id,
-        pathPoints: {
-          createMany: { data: this.convertPaths(paths) },
+        statusId: robot.status.id,
+        operations: {
+          create: {
+            ...operationDetails,
+            schemaId: schema.id,
+            pathPoints: {
+              createMany: { data: this.convertPaths(paths) },
+            },
+          },
         },
       },
     });
@@ -71,7 +100,7 @@ export class SqlOperationsRepository implements OperationsRepository {
   }
 
   private convertPaths(paths: Path[]): Array<Omit<PathPoint, 'operationId'>> {
-    const pathPoints: Array<Omit<PathPoint, 'operationId'>> = [];
+    let pathPoints: Array<Omit<PathPoint, 'operationId'>> = [];
 
     for (const path of paths) {
       const points = path.map((point) => ({
@@ -85,7 +114,7 @@ export class SqlOperationsRepository implements OperationsRepository {
       const targetPoint = points.pop()!;
       targetPoint.targetPoint = true;
 
-      pathPoints.concat(points, targetPoint);
+      pathPoints = pathPoints.concat(points, targetPoint);
     }
 
     return pathPoints.map((point, index) => ({

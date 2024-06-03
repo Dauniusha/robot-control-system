@@ -12,7 +12,7 @@
   },
   "overrides": [
     {
-      "files": "*.ts",
+      "files": "**/*.ts",
       "rules": {
         "@typescript-eslint/promise-function-async": "off",
         "@typescript-eslint/consistent-type-assertions": "off",

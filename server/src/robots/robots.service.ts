@@ -1,4 +1,9 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { type RobotsRepository } from '../core/repositories/robots.repository';
 import { Operation } from '../core/entities/operation';
 import { type SchemasRepository } from '../core/repositories/schemas.repository';
@@ -6,9 +11,12 @@ import {
   type WebhookedSchemaPoint,
   type Coordinate,
 } from '../core/entities/schema';
-import { type Robot } from '../core/entities/robot';
+import { Robot } from '../core/entities/robot';
 import { type OperationsRepository } from '../core/repositories/operations.repository';
 import { type InitiateOperationDto } from '../core/dto/initiate-operation.dto';
+import { type CreateRobotDto } from '../core/dto/create-robot.dto';
+import { RobotDto } from '../core/dto/robot.dto';
+import { OperationDto } from '../core/dto/operation.dto';
 
 export enum RobotEvent {
   PathAccepted = 'path_accepted',
@@ -19,6 +27,8 @@ export enum RobotEvent {
 }
 
 export class RobotsService {
+  private readonly logger = new Logger('RobotsService');
+
   constructor(
     private readonly robotsRepository: RobotsRepository,
     private readonly schemasRepository: SchemasRepository,
@@ -40,8 +50,11 @@ export class RobotsService {
     return operation;
   }
 
-  async finishOperation(details: { id: string }): Promise<void> {
-    const robot = await this.getById(details.id);
+  async finishOperation(
+    robotId: string,
+    details: Record<string, unknown>,
+  ): Promise<void> {
+    const robot = await this.getById(robotId);
 
     robot.finishOperation();
 
@@ -83,6 +96,37 @@ export class RobotsService {
     return operation.robot;
   }
 
+  async create(request: CreateRobotDto): Promise<RobotDto> {
+    const existingRobot = await this.robotsRepository.getBySerialNumber(
+      request.serialNumber,
+    );
+
+    if (existingRobot) {
+      throw new BadRequestException(
+        `Robot ${request.serialNumber} already exists`,
+      );
+    }
+
+    const robot = Robot.create(request);
+
+    await this.robotsRepository.create(robot);
+    return RobotDto.fromEntity(robot);
+  }
+
+  async getOperations(): Promise<OperationDto[]> {
+    const operations = await this.operationsRepository.getAll();
+
+    return operations.map((entity) => OperationDto.fromEntity(entity));
+  }
+
+  async getOperation(id: string): Promise<OperationDto> {
+    const operation = await this.operationsRepository.getById(id);
+
+    if (!operation) throw new NotFoundException(`Operation ${id} not found`);
+
+    return OperationDto.fromEntity(operation);
+  }
+
   private async getById(id: string): Promise<Robot> {
     const robot = await this.robotsRepository.getById(id);
 
@@ -102,6 +146,23 @@ export class RobotsService {
         operationId: robot.runningOperation!.id,
         releaseAt: new Date(),
       }),
-    });
+    })
+      .then(async (response: Response) => {
+        if (!response.ok) {
+          const error = (await response.json()) as {
+            message: string;
+            statusCode: number;
+          };
+
+          throw new HttpException(error, error.statusCode);
+        }
+
+        this.logger.log(
+          `Point ${releasePoint.name} done by robot ${robot.serialNumber} in operation ${robot.runningOperation!.id}`,
+        );
+      })
+      .catch((error: Error) => {
+        this.logger.error(error);
+      });
   }
 }

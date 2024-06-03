@@ -4,6 +4,7 @@ import {
   IsArray,
   IsNotEmpty,
   IsNumber,
+  IsOptional,
   Max,
   MaxLength,
   Min,
@@ -53,6 +54,10 @@ export class CreateMapDto {
   base!: SchemaPointDto;
 
   @IsNotEmpty()
+  @MaxLength(255)
+  baseWebhookUrl!: string;
+
+  @IsNotEmpty()
   @MaxLength(40)
   name!: string;
 
@@ -67,4 +72,8 @@ export class CreateMapDto {
   @Max(200)
   @Type(() => Number)
   columns!: number;
+
+  @IsOptional()
+  @MaxLength(30)
+  robotSerialNumber?: string;
 }

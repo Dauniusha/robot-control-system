@@ -20,14 +20,17 @@ model WorkloadStatus {
 }
 
 model Robot {
-  id        String         @id @RobotControlSystem.Uuid
-  statusId  String         @map("status_id") @RobotControlSystem.VarChar(20)
-  model     String         @RobotControlSystem.VarChar(20)
-  status    WorkloadStatus @relation(fields: [statusId], references: [id], onDelete: Restrict)
-  createdAt DateTime       @default(now()) @map("created_at")
+  id           String         @id @RobotControlSystem.Uuid
+  statusId     String         @map("status_id") @RobotControlSystem.VarChar(30)
+  serialNumber String         @unique @map("serial_number") @RobotControlSystem.VarChar(30)
+  model        String         @RobotControlSystem.VarChar(20)
+  status       WorkloadStatus @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  createdAt    DateTime       @default(now()) @map("created_at")
 
   operations Operation[]
+  schema     Schema[]
 
+  @@index([serialNumber])
   @@map("robots")
 }
 
@@ -35,7 +38,7 @@ model Operation {
   id        String    @id @RobotControlSystem.Uuid
   robotId   String    @map("robot_id") @RobotControlSystem.Uuid
   schemaId  String    @map("schema_id") @RobotControlSystem.Uuid
-  status    String    @RobotControlSystem.Uuid
+  status    String    @RobotControlSystem.VarChar(20)
   createdAt DateTime  @default(now()) @map("created_at")
   doneAt    DateTime? @map("done_at")
 
@@ -66,11 +69,13 @@ model Schema {
   assignedRobotId String?  @map("assigned_robot_id") @RobotControlSystem.Uuid
   rows            Int
   columns         Int
-  robotBaseId     String   @map("robot_base_id") @RobotControlSystem.Uuid
+  robotBaseId     String   @unique @map("robot_base_id") @RobotControlSystem.Uuid
+  baseWebhookUrl  String   @unique @map("base_webhook_url") @RobotControlSystem.VarChar(512)
   createdAt       DateTime @default(now()) @map("created_at")
   version         Int      @default(1)
 
   robotBase     SchemaPoint    @relation(fields: [robotBaseId], references: [id], onDelete: Restrict)
+  assignedRobot Robot?         @relation(fields: [assignedRobotId], references: [id], onDelete: SetNull)
   releasePoints ReleasePoint[]
   barriers      Barrier[]
   operations    Operation[]
@@ -80,7 +85,7 @@ model Schema {
 
 model SchemaPoint {
   id   String @id @RobotControlSystem.Uuid
-  name String @unique @RobotControlSystem.VarChar(40)
+  name String @RobotControlSystem.VarChar(40)
   x    Int
   y    Int
 
@@ -93,11 +98,11 @@ model SchemaPoint {
 model ReleasePoint {
   id         String @id @RobotControlSystem.Uuid
   schemaId   String @map("schema_id") @RobotControlSystem.Uuid
-  pointId    String @map("point_id") @RobotControlSystem.Uuid
+  pointId    String @unique @map("point_id") @RobotControlSystem.Uuid
   webhookUrl String @map("webhook_url") @RobotControlSystem.VarChar(512)
 
   schema Schema      @relation(fields: [schemaId], references: [id], onDelete: Cascade)
-  point  SchemaPoint @relation(fields: [pointId], references: [id], onDelete: Restrict)
+  point  SchemaPoint @relation(fields: [pointId], references: [id], onDelete: Cascade)
 
   @@index([schemaId])
   @@map("release_points")

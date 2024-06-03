@@ -11,6 +11,7 @@ export class SchemaDto {
       id: schema.id,
       name: schema.name,
       robotId: schema.assignedRobot?.id,
+      robotSerialNo: schema.assignedRobot?.serialNumber,
       rows: schema.rows,
       columns: schema.columns,
       barriers: schema.barriers,
@@ -33,6 +34,7 @@ export class SchemaDto {
   points!: WebhookedPointDto[];
   barriers!: CoordinateDto[];
   robotId?: string;
+  robotSerialNo?: string;
 }
 
 export class SchemaCardDto {

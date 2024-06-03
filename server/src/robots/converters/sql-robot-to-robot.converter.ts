@@ -8,7 +8,7 @@ import { Schema } from '../../core/entities/schema';
 
 type SqlOperation = prisma.Operation & {
   pathPoints: prisma.PathPoint[];
-  schema: prisma.Schema;
+  schema: Omit<Schema, 'assignedRobot'>;
 };
 
 export type SqlRobot = prisma.Robot & {
@@ -26,8 +26,9 @@ export class SqlRobotToRobotConverter implements Converter<SqlRobot, Robot> {
       id: details.status.id as WorkloadStatus,
     };
     robot.model = details.model;
+    robot.serialNumber = details.serialNumber;
 
-    if (details.operations) {
+    if (details.operations?.length) {
       robot.runningOperation = this.convertOperation(
         details.operations[0],
         robot,
@@ -42,8 +43,10 @@ export class SqlRobotToRobotConverter implements Converter<SqlRobot, Robot> {
     operation.id = details.id;
     operation.robot = robot;
 
-    operation.schema = new Schema();
-    operation.schema.id = details.schema.id;
+    operation.schema = Object.assign(new Schema(), {
+      ...details.schema,
+      assignedRobot: robot,
+    });
 
     operation.paths = [];
     let path = [];

@@ -1,3 +1,24 @@
+p {
+  margin: 0;
+}
+
+h2 {
+  margin: 15px 0;
+}
+
+h3 {
+  margin: 5px 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.regular-font {
+  font-size: 18px;
+  font-weight: 400;
+}
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -7,9 +28,8 @@ body {
 .container {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  height: 100vh;
+  margin: 20px 40px;
 }
 
 #mapCanvas {
@@ -27,17 +47,21 @@ body {
 }
 
 .map-container {
-  margin: 20px 40px;
   display: flex;
   gap: 10px;
   flex-direction: column;
+  margin-bottom: 20px;
 }
 
 .cell {
+  position: relative;
   width: 50px;
   height: 50px;
   cursor: pointer;
   border: 1px solid #333;
+  text-align: center;
+  line-height: 50px;
+  font-size: 28px;
 }
 .barrier {
   background-color: black;
@@ -49,6 +73,31 @@ body {
   background-color: yellow;
 }
 
+.path-point {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding: 1px 2px;
+  box-sizing: border-box;
+  background-color: aqua;
+  opacity: 0.4;
+  text-align: left;
+  line-height: initial;
+  font-size: 11px;
+}
+
+.robot-position {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: chocolate;
+  opacity: 0.4;
+}
+
 button {
   margin: 0 10px;
   padding: 10px 20px;
@@ -58,4 +107,118 @@ button {
 .mode-container {
   display: flex;
   gap: 5px;
+}
+
+
+#mapSearch {
+  width: 200px;
+}
+
+.list-container {
+  margin-top: 5px;
+  max-width: 600px;
+}
+
+.map-list-container {
+  grid-template-columns: 30px 1fr 30px;
+}
+
+.operation-list-container {
+  grid-template-columns: 30px 2fr 250px 100px 1.5fr;
+}
+
+.path-history-list-container {
+  width: auto;
+  max-width: 500px;
+  grid-template-columns: 30px 170px 60px 200px
+}
+
+.events-history-list-container {
+  width: auto;
+  max-width: 600px;
+  grid-template-columns: 30px 250px 100px 180px
+}
+
+.list-header__container {
+  display: grid;
+  grid-template-columns: inherit;
+  background-color: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px 5px 0 0;
+  align-items: center;
+}
+
+.list-header {
+  font-weight: bold;
+  text-align: center;
+}
+
+.map-list-item {
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 0 0 5px 5px;
+  display: grid;
+  grid-template-columns: inherit;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+}
+
+.list-item__number,
+.map-list-item__number {
+  background-color: #333;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 3px;
+  text-align: center;
+}
+
+.map-list-item__name {
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
+}
+
+.map-list-item__size {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+}
+
+.list-item {
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
+}
+
+.list-item__period {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+}
+
+.events-history-list-item,
+.path-history-list-item,
+.operation-list-item {
+  background-color: #f5f5f5;
+  padding: 20px;
+  border-radius: 0 0 5px 5px;
+  display: grid;
+  grid-template-columns: inherit;
+  align-items: center;
+  text-decoration: none;
+  color: #333;
+  border-bottom: #666 1px solid;
+}
+
+.information-container__map {
+  display: flex;
+  gap: 20px;
+}
+
+.history-container {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
 }

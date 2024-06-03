@@ -4,11 +4,12 @@ import { type Traversal, type Path } from './types';
 
 export class Client {
   private readonly socket: Socket;
+  private readonly traversal: Traversal;
 
   constructor(TraversalAlgorithm: new (socket: Socket) => Traversal) {
     this.socket = io(`${process.env.SERVER_URL}?id=${process.env.ROBOT_ID}`);
 
-    const traversal = new TraversalAlgorithm(this.socket);
+    this.traversal = new TraversalAlgorithm(this.socket);
 
     this.socket.on('connect', async () => {
       console.log('Robot connected');
@@ -17,7 +18,7 @@ export class Client {
         for (const path of paths) {
           const targetPoint = path.at(-1);
 
-          await traversal.traversePath(path); // eslint-disable-line no-await-in-loop
+          await this.traversal.traversePath(path); // eslint-disable-line no-await-in-loop
 
           this.socket.emit('target_point_reached', { point: targetPoint });
           await this.released(); // eslint-disable-line no-await-in-loop
@@ -25,6 +26,7 @@ export class Client {
 
         const details = {};
         this.socket.emit('operation_finished', details);
+        console.log('Operation finished');
       });
     });
 

@@ -8,9 +8,11 @@ import { AppService } from './app.service';
 import { LoggerModule } from './core/logging';
 import { RequestLoggerMiddleware } from './core/middlewares';
 import { ConfigModule } from './core/config/config.module';
+import { RobotsModule } from './robots/robots.module';
+import { SchemasModule } from './schemas/schemas.module';
 
 @Module({
-  imports: [ConfigModule, LoggerModule],
+  imports: [ConfigModule, LoggerModule, RobotsModule, SchemasModule],
   controllers: [AppController],
   providers: [AppService],
 })

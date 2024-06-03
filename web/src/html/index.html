@@ -7,26 +7,30 @@
   <link rel="stylesheet" href="../styles/index.css">
 </head>
 <body>
-  <div class="map-container"></div>
-  <div>
-    <div class="mode-container">
-      <div>Mode:</div>
-      <div id="mode">barriers</div>
+  <div class="container">
+    <h2>Maps</h2>
+    <div>
+      <input type="text" id="mapSearch" placeholder="Search...">
+      <button id="createRobotBtn">Create Robot</button>
     </div>
-    <label for="mapWidth">Map Width:</label>
-    <input type="number" id="mapWidth" min="1" max="100" value="5">
-    <br>
-    <label for="mapHeight">Map Height:</label>
-    <input type="number" id="mapHeight" min="1" max="100" value="5">
-    <br>
-    <br>
-    <button onclick="selectMode('barriers')">Barriers mode</button>
-    <button onclick="selectMode('points')">Points mode</button>
-    <button onclick="selectMode('base')">Base mode</button>
-    <button onclick="generateMap()">Generate Map</button>
-    <button onclick="saveMap()">Save Map</button>
-    <button onclick="regenerateMap()">Regenerate Map</button>
+    <div class="list-container map-list-container">
+      <div class="list-header__container">
+        <span class="list-header">#</span>
+        <span class="list-header">Name</span>
+        <span class="list-header">Size</span>
+      </div>
+    </div>
+    <h2>Operations</h2>
+    <div class="operation-list-container">
+      <div class="list-header__container">
+        <span class="list-header">#</span>
+        <span class="list-header">Map Name</span>
+        <span class="list-header">Status</span>
+        <span class="list-header">Points №</span>
+        <span class="list-header">Period</span>
+      </div>
+    </div>
   </div>
-  <script src="../js/index.js"></script>
+  <script type="module" src="../js/index.js"></script>
 </body>
 </html>

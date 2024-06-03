@@ -26,6 +26,11 @@ export class SchemasController {
     return this.schemasService.search(request);
   }
 
+  @Get(':id')
+  async getById(@Param('id') id: string): Promise<SchemaDto> {
+    return this.schemasService.get(id);
+  }
+
   @Post()
   async create(@Body() request: CreateMapDto): Promise<SchemaDto> {
     return this.schemasService.create(request);

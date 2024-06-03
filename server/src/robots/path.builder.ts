@@ -5,12 +5,14 @@ import {
 } from '../core/entities/schema';
 import { type Path } from '../core/entities/operation';
 import * as leeAlgorithm from './lee-algorithm';
+import AntColonyOptimizer from './ant-colony.optimizer';
 
 export class PathBuilder {
   private readonly matrixedSchema: number[][];
   private readonly robotBaseCoordinate: Coordinate;
   private targetPoints: Coordinate[] = [];
   private pathMatrix: Path[][] = [];
+  private basePosition = 0;
 
   constructor(schema: Schema) {
     this.matrixedSchema = schema.toMatrix();
@@ -22,6 +24,7 @@ export class PathBuilder {
       ...targetPoints.map((point) => point.coordinate),
       this.robotBaseCoordinate,
     ];
+    this.basePosition = this.targetPoints.length - 1;
 
     return this;
   }
@@ -42,7 +45,7 @@ export class PathBuilder {
     });
 
     const distanceMatrix = this.pathMatrix.map((row) =>
-      row.map((column) => column.length),
+      row.map((column) => column.length - 1),
     );
 
     const antOptimizer = new AntColonyOptimizer({
@@ -51,10 +54,12 @@ export class PathBuilder {
       smellCoef: 1,
       numberAnts: 5,
       numberIterations: 10,
+      startPosition: this.basePosition,
+      finishPosition: this.basePosition,
     });
     const [citiesPath, bestPathLength] = antOptimizer.run();
 
-    console.log('Best cities path:', citiesPath); // Output: [0, 1, 2, 4, 0]
+    console.log('Best cities path:', citiesPath);
     console.log('Best path length:', bestPathLength);
 
     return this.convertCitiesPathToPath(citiesPath);

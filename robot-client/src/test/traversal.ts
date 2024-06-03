@@ -13,7 +13,7 @@ export class TestTraversal implements Traversal {
 
   private async moveRobotToPoint(): Promise<void> {
     return new Promise<void>((resolve) => {
-      setTimeout(resolve, Math.random() * 4000);
+      setTimeout(resolve, Math.random() * 6000);
     });
   }
 }

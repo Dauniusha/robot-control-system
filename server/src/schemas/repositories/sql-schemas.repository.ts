@@ -7,10 +7,12 @@ import {
 } from '../../core/dto/schema-search-request.dto';
 import { type SchemaPoint, type Schema } from '../../core/entities/schema';
 import { type SchemasRepository } from '../../core/repositories';
+import { SqlRobotToRobotConverter } from '../../robots/converters/sql-robot-to-robot.converter';
 import { SqlSchemaToSchemaConverter } from '../converters/sql-schema-to-schema.converter';
 
 export class SqlSchemasRepository implements SchemasRepository {
   private readonly schemaConverter = new SqlSchemaToSchemaConverter();
+  private readonly robotConverter = new SqlRobotToRobotConverter();
 
   constructor(private readonly prismaService: PrismaService) {}
 
@@ -23,12 +25,25 @@ export class SqlSchemasRepository implements SchemasRepository {
           include: { point: true },
         },
         barriers: true,
+        assignedRobot: {
+          include: {
+            status: true,
+          },
+        },
       },
     });
 
     if (!schema) return undefined;
 
-    return this.schemaConverter.convert(schema);
+    console.log(schema.assignedRobot);
+    const robot =
+      schema.assignedRobot && this.robotConverter.convert(schema.assignedRobot);
+
+    console.log(robot);
+    return this.schemaConverter.convert({
+      ...schema,
+      assignedRobot: robot,
+    });
   }
 
   async getByName(name: string): Promise<Schema | undefined> {
@@ -95,6 +110,10 @@ export class SqlSchemasRepository implements SchemasRepository {
         ),
       });
 
+      const schemaPoint = await client.schemaPoint.create({
+        data: this.getPointUpdateOption(schema.robotBase),
+      });
+
       await client.schema.create({
         data: {
           id: schema.id,
@@ -102,9 +121,8 @@ export class SqlSchemasRepository implements SchemasRepository {
           name: schema.name,
           rows: schema.rows,
           columns: schema.columns,
-          robotBase: {
-            create: this.getPointUpdateOption(schema.robotBase),
-          },
+          robotBaseId: schemaPoint.id,
+          baseWebhookUrl: schema.robotBaseWebhookUrl,
           barriers: { createMany: { data: schema.barriers } },
           releasePoints: {
             createMany: {
@@ -153,8 +171,25 @@ export class SqlSchemasRepository implements SchemasRepository {
 
   async update(schema: Schema): Promise<void> {
     await this.prismaService.createTransaction(async (client) => {
-      await client.releasePoint.deleteMany({
-        where: { schemaId: schema.id },
+      await Promise.all([
+        client.schemaPoint.deleteMany({
+          where: {
+            releasePoints: {
+              some: {
+                schemaId: schema.id,
+              },
+            },
+          },
+        }),
+        client.barrier.deleteMany({
+          where: { schemaId: schema.id },
+        }),
+      ]);
+
+      const basePoint = await client.schemaPoint.upsert({
+        where: { id: schema.robotBase.id },
+        create: this.getPointUpdateOption(schema.robotBase),
+        update: this.getPointUpdateOption(schema.robotBase),
       });
 
       await client.schemaPoint.createMany({
@@ -170,13 +205,7 @@ export class SqlSchemasRepository implements SchemasRepository {
           name: schema.name,
           rows: schema.rows,
           columns: schema.columns,
-          robotBase: {
-            upsert: {
-              where: { id: schema.robotBase.id },
-              create: this.getPointUpdateOption(schema.robotBase),
-              update: this.getPointUpdateOption(schema.robotBase),
-            },
-          },
+          robotBaseId: basePoint.id,
           barriers: { createMany: { data: schema.barriers } },
           releasePoints: {
             createMany: {
