@@ -16,7 +16,7 @@ export class Client {
 
       this.socket.on('path_accepted', async (paths: Path[]) => {
         for (const path of paths) {
-          const targetPoint = path.at(-1);
+          const targetPoint = path[path.length - 1]; // eslint-disable-line unicorn/prefer-at
 
           await this.traversal.traversePath(path); // eslint-disable-line no-await-in-loop
 

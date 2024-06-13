@@ -6,6 +6,7 @@ export class TestTraversal implements Traversal {
 
   async traversePath(path: Path) {
     for (const point of path) {
+      console.log(point);
       await this.moveRobotToPoint(); // eslint-disable-line no-await-in-loop
       this.socket.emit('point_reached', { point });
     }

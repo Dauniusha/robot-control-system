@@ -1,9 +1,5 @@
-import { type Schema, WebhookedSchemaPoint } from '../entities/schema';
-import {
-  type CoordinateDto,
-  type SchemaPointDto,
-  type WebhookedPointDto,
-} from './create-map.dto';
+import { type Schema } from '../entities/schema';
+import { type CoordinateDto, type WebhookedPointDto } from './create-map.dto';
 
 export class SchemaDto {
   static fromEntity(schema: Schema): SchemaDto {
@@ -18,6 +14,7 @@ export class SchemaDto {
       base: {
         ...schema.robotBase.coordinate,
         name: schema.robotBase.name,
+        webhookUrl: schema.robotBaseWebhookUrl,
       },
       points: schema.releasePoints.map(({ coordinate, ...point }) => ({
         ...coordinate,
@@ -30,7 +27,7 @@ export class SchemaDto {
   name!: string;
   rows!: number;
   columns!: number;
-  base!: SchemaPointDto;
+  base!: WebhookedPointDto;
   points!: WebhookedPointDto[];
   barriers!: CoordinateDto[];
   robotId?: string;

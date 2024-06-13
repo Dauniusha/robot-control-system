@@ -70,7 +70,7 @@ model Schema {
   rows            Int
   columns         Int
   robotBaseId     String   @unique @map("robot_base_id") @RobotControlSystem.Uuid
-  baseWebhookUrl  String   @unique @map("base_webhook_url") @RobotControlSystem.VarChar(512)
+  baseWebhookUrl  String   @map("base_webhook_url") @RobotControlSystem.VarChar(512)
   createdAt       DateTime @default(now()) @map("created_at")
   version         Int      @default(1)
 

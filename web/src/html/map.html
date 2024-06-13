@@ -9,18 +9,28 @@
 <body class="container">
   <div class="map-container"></div>
   <div class="control-container">
-    <div class="mode-container">
-      <div>Mode:</div>
-      <div id="mode">barriers</div>
+    <div class="input-controls">
+      <div class="mode-container">
+        <div>Mode:</div>
+        <div id="mode">barriers</div>
+      </div>
+      <div>
+        <label for="mapWidth">Map Width:</label>
+        <input type="number" id="mapWidth" min="1" max="100" value="5">
+      </div>
+      <div>
+        <label for="mapHeight">Map Height:</label>
+        <input type="number" id="mapHeight" min="1" max="100" value="5">
+      </div>
+      <div>
+        <label for="mapName">Map Name:</label>
+        <input type="text" id="mapName" placeholder="Name" maxlength="30">
+      </div>
+      <div>
+        <label for="robotSerialNo">Robot Serial No:</label>
+        <input type="text" id="robotSerialNo" placeholder="Serial No" maxlength="30">
+      </div>
     </div>
-    <label for="mapWidth">Map Width:</label>
-    <input type="number" id="mapWidth" min="1" max="100" value="5">
-    <br>
-    <label for="mapHeight">Map Height:</label>
-    <input type="number" id="mapHeight" min="1" max="100" value="5">
-    <br>
-    <label for="robotSerialNo">Robot Serial No:</label>
-    <input type="text" id="robotSerialNo" placeholder="Serial No" maxlength="30">
     <br>
     <br>
     <button id="barriersMode">Barriers mode</button>

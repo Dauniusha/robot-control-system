@@ -17,9 +17,9 @@
     "checkJs": false,
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2015",
+    "target": "ESNext",
     "lib": [
-      "es2019"
+      "ESNext"
     ],
     "types": [
       "node",

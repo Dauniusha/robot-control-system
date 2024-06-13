@@ -19,6 +19,7 @@ const pointsModeButton = document.querySelector('#pointsMode');
 const baseModeButton = document.querySelector('#baseMode');
 const robotSerialNumberInput = document.querySelector('#robotSerialNo');
 const saveButton = document.querySelector('#saveBtn');
+const mapNameInput = document.querySelector('#mapName');
 const regenerateButton = document.querySelector('#regenerateBtn');
 
 class Cell {
@@ -37,11 +38,12 @@ class Cell {
     console.log(this.element);
   }
 
-  toBase(pointName) {
+  toBase(pointName, webhookUrl) {
     this.element.classList.remove('point', 'barrier');
     this.element.classList.add('base');
     this.mode = 'base';
     this.pointName = pointName ?? prompt('Enter base name');
+    this.webhookUrl = webhookUrl ?? prompt('Enter webhook url');
   }
 
   toPathPoint(position) {
@@ -165,7 +167,7 @@ function selectMode(newMode) {
 
 async function saveMap() {
   const mapRequest = {
-    name: 'test',
+    name: mapNameInput.value,
     rows: cells.length,
     columns: cells[0].length,
     points: [],
@@ -188,7 +190,12 @@ async function saveMap() {
           mapRequest.barriers.push({ x, y });
           break;
         case 'base':
-          mapRequest.base = { x, y, name: cell.pointName };
+          mapRequest.base = {
+            x,
+            y,
+            name: cell.pointName,
+          };
+          mapRequest.baseWebhookUrl = cell.webhookUrl;
           break;
       }
     }
@@ -196,7 +203,7 @@ async function saveMap() {
 
   await (mapId
     ? utils.put(`http://localhost:3000/schemas/${mapId}`, mapRequest)
-    : post('http://localhost:3000/schemas', mapRequest));
+    : utils.post('http://localhost:3000/schemas', mapRequest));
 }
 
 async function initMap(id, operationId) {
@@ -212,7 +219,10 @@ async function initMap(id, operationId) {
       cells[barrier.y][barrier.x].toBarrier();
     }
 
-    cells[schema.base.y][schema.base.x].toBase(schema.base.name);
+    cells[schema.base.y][schema.base.x].toBase(
+      schema.base.name,
+      schema.base.webhookUrl,
+    );
 
     for (const point of schema.points) {
       cells[point.y][point.x].toPoint(point.name, point.webhookUrl);
@@ -347,23 +357,35 @@ async function initMap(id, operationId) {
     return;
   }
 
-  const schema = await utils.get(`http://localhost:3000/schemas/${id}`);
-  widthInput.value = schema.rows;
-  heightInput.value = schema.columns;
+  if (id) {
+    const schema = await utils.get(`http://localhost:3000/schemas/${id}`);
+    widthInput.value = schema.rows;
+    heightInput.value = schema.columns;
 
-  generateMap(schema.rows, schema.columns);
+    generateMap(schema.rows, schema.columns);
 
-  for (const barrier of schema.barriers) {
-    cells[barrier.y][barrier.x].toBarrier();
+    for (const barrier of schema.barriers) {
+      cells[barrier.y][barrier.x].toBarrier();
+    }
+
+    cells[schema.base.y][schema.base.x].toBase(
+      schema.base.name,
+      schema.base.webhookUrl,
+    );
+
+    for (const point of schema.points) {
+      cells[point.y][point.x].toPoint(point.name, point.webhookUrl);
+    }
+
+    robotSerialNumberInput.value = schema.robotSerialNo;
+    mapNameInput.value = schema.name;
+    return;
   }
 
-  cells[schema.base.y][schema.base.x].toBase(schema.base.name);
+  widthInput.value = 7;
+  heightInput.value = 7;
 
-  for (const point of schema.points) {
-    cells[point.y][point.x].toPoint(point.name, point.webhookUrl);
-  }
-
-  robotSerialNumberInput.value = schema.robotSerialNo;
+  generateMap(7, 7);
 }
 
 async function updateOperationDetails(operationId) {

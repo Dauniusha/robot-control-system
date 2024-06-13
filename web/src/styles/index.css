@@ -109,6 +109,11 @@ button {
   gap: 5px;
 }
 
+.input-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
 
 #mapSearch {
   width: 200px;
