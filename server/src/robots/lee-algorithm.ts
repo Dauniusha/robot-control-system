@@ -57,7 +57,7 @@ function getNeighbors(
     const nextX = current.x + delta.x;
     const nextY = current.y + delta.y;
 
-    const inField = nextX >= 0 && nextX < rows && nextY >= 0 && nextY < cols;
+    const inField = nextX >= 0 && nextX < cols && nextY >= 0 && nextY < rows;
 
     if (inField && field[nextY][nextX] !== 1) {
       neighbors.push({ x: nextX, y: nextY });

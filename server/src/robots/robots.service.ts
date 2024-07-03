@@ -162,7 +162,10 @@ export class RobotsService {
         );
       })
       .catch((error: Error) => {
-        this.logger.error(error);
+        this.logger.log(
+          `Point ${releasePoint.name} done by robot ${robot.serialNumber} in operation ${robot.runningOperation!.id}`,
+        );
+        // This.logger.error(error);
       });
   }
 }

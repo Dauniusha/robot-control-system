@@ -90,8 +90,12 @@ class Cell {
 }
 
 (function () {
-  widthInput.addEventListener('change', generateMap);
-  heightInput.addEventListener('change', generateMap);
+  widthInput.addEventListener('change', () =>
+    generateMap(widthInput.value, heightInput.value),
+  );
+  heightInput.addEventListener('change', () =>
+    generateMap(widthInput.value, heightInput.value),
+  );
 
   barriersModeButton.addEventListener('click', () => selectMode('barriers'));
   pointsModeButton.addEventListener('click', () => selectMode('points'));
@@ -213,7 +217,7 @@ async function initMap(id, operationId) {
       utils.get(`http://localhost:3000/robots/operations/${operationId}`),
     ]);
 
-    generateMap(schema.rows, schema.columns);
+    generateMap(schema.columns, schema.rows);
 
     for (const barrier of schema.barriers) {
       cells[barrier.y][barrier.x].toBarrier();
@@ -359,10 +363,10 @@ async function initMap(id, operationId) {
 
   if (id) {
     const schema = await utils.get(`http://localhost:3000/schemas/${id}`);
-    widthInput.value = schema.rows;
-    heightInput.value = schema.columns;
+    widthInput.value = schema.columns;
+    heightInput.value = schema.rows;
 
-    generateMap(schema.rows, schema.columns);
+    generateMap(schema.columns, schema.rows);
 
     for (const barrier of schema.barriers) {
       cells[barrier.y][barrier.x].toBarrier();

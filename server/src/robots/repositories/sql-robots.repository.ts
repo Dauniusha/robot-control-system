@@ -126,6 +126,7 @@ export class SqlRobotsRepository implements RobotsRepository {
   }
 
   async reachPoint(id: string, point: Coordinate): Promise<void> {
-    console.log('Log collector does not implemented');
+    // Console.log('Log collector does not implemented');
+    console.log(`Point ${point.y}:${point.x} reached by robot ${id}`);
   }
 }
